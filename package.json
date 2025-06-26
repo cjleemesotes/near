@@ -1,0 +1,16 @@
+{
+  "name": "file-hash-util",
+  "version": "0.1.0",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc"
+  },
+  "optionalDependencies": {
+    "hash-wasm": "^5.0.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.4.5"
+  }
+}
