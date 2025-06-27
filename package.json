@@ -1,19 +1,17 @@
 {
-  "name": "near",
+  "name": "registry-contract",
   "version": "1.0.0",
-  "description": "",
-  "main": "dist/index.js",
-  "scripts": {
-    "test": "tsc -p tsconfig.json --noEmit",
-    "build": "tsc -p tsconfig.json"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
   "type": "module",
-  "exports": "./dist/index.js",
-  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "near-sdk-js compile src/contract.ts build/registry.wasm",
+    "test": "npm run build && ava"
+  },
   "dependencies": {
-    "hash-wasm": "^5"
+    "near-sdk-js": "^2.0.0"
+  },
+  "devDependencies": {
+    "ava": "^5.3.1",
+    "near-workspaces": "^0.6.1",
+    "typescript": "^5.4.0"
   }
 }

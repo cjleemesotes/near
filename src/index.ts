@@ -1,21 +1,20 @@
-import { isNode } from './env';
-import { hashNode } from './node-engine';
-import { hashBrowser } from './browser-engine';
-import type { Algo, HashResult } from './types';
+import { hashNode }   from './node-engine.js';
+import { hashBrowser } from './browser-engine.js';
+import type { HashAlgo, HashResult } from './types.js';
 
+const isNode = typeof process !== 'undefined' && !!process.versions?.node;
+
+/** Portable file/Blob hashing (hex) */
 export async function hashFile(
-  source: string | Blob,
-  opts?: { algorithm?: Algo; chunkSize?: number }
+  src: string | Blob,
+  opts?: { algorithm?: HashAlgo; chunkSize?: number },
 ): Promise<HashResult> {
   const algo = opts?.algorithm ?? 'sha256';
-  if (isNode && typeof source === 'string') {
-    return hashNode(source, algo);
-  }
-  if (!isNode && source instanceof Blob) {
-    return hashBrowser(source, algo, opts?.chunkSize);
-  }
+  if (isNode && typeof src === 'string')
+    return hashNode(src, algo, opts?.chunkSize);
+  if (!isNode && src instanceof Blob)
+    return hashBrowser(src, algo);
   return { ok: false, code: 'ETYPE', message: 'Invalid source for current runtime' };
 }
 
-export type { Algo, HashResult } from './types';
-
+export type { HashAlgo, HashResult } from './types.js';

@@ -1,26 +1,24 @@
 import { createSHA256, createSHA512, createBLAKE3 } from 'hash-wasm';
-import { Algo, HashResult } from './types';
+import type { HashAlgo, HashResult } from './types.js';
 
-const factories = {
-  sha256: createSHA256,
-  sha512: createSHA512,
-  blake3: createBLAKE3,
+type Factory = () => Promise<{ update(d: Uint8Array): void; digest(enc?: 'hex'): string }>;
+const factories: Record<HashAlgo, Factory> = {
+  sha256: createSHA256 as Factory,
+  sha512: createSHA512 as Factory,
+  blake3: createBLAKE3 as Factory,
 };
 
-export async function hashBrowser(blob: Blob, algo: Algo, chunk = 4 * 1024 * 1024): Promise<HashResult> {
+export async function hashBrowser(blob: Blob, algo: HashAlgo): Promise<HashResult> {
   try {
     const hasher = await factories[algo]();
     let bytes = 0;
-    const reader = blob.stream().getReader();
-    while (true) {
-      const { done, value } = await reader.read();
-      if (done) break;
-      const buf = value as Uint8Array;
-      hasher.update(buf);
-      bytes += buf.byteLength;
+    for await (const chunk of blob.stream()) {
+      const data = chunk as Uint8Array;
+      hasher.update(data);
+      bytes += data.byteLength;
     }
-    return { ok: true, hash: hasher.digest(), bytes, algo };
+    return { ok: true, hash: hasher.digest('hex'), bytes, algo };
   } catch (e: any) {
-    return { ok: false, code: 'EBROWSER', message: e.message, cause: e };
+    return { ok: false, code: 'EBROWSER', message: String(e?.message ?? e), cause: e };
   }
 }
