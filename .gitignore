@@ -2,3 +2,5 @@ venv/
 node_modules/
 build/
 dist/
+frames/
+near-intents-1click-example/
